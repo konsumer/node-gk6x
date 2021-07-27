@@ -1,0 +1,16 @@
+{
+  "name": "gk6x",
+  "version": "0.0.0",
+  "type": "module",
+  "description": "This adds support for GK6X keyboards in nodejs.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "David Konsumer <konsumer@jetboystudio.com>",
+  "license": "MIT",
+  "dependencies": {
+    "node-hid": "^2.1.1"
+  }
+}
