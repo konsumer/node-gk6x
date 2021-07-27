@@ -49,6 +49,16 @@ npm i gk6x
 
 > explanation goes here
 
+## todo
+
+- make it actually work (it's a stub, now)
+- test on different OS's ([keyboard HID is known to be weird on mac/win](https://github.com/node-hid/node-hid#devices-node-hid-cannot-read))
+- make cli app for getting/setting params from official files
+- make TUI for setting up keyboard in terminal
+- support for updating firmware
+- use lerna to seperate lib/cli/gui
+- make builds of cli (via pkg) and gui (via [neutralino](https://neutralino.js.org/) or electron)
+
 ## thanks
 
 This is all due to [the awesome work of @pixeltris](https://github.com/pixeltris/GK6X) in C#. They, in-turn, used [@wgwoods work in python](https://github.com/wgwoods/gk64-python).
