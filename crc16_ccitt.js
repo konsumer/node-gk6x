@@ -34,14 +34,14 @@ const crc16_ccitt_tabl = [
 ]
 
 export const crc16_ccitt = (reg_init, message) => {
-  if(typeof message === 'undefined'){
-    message = reg_init;
-    reg_init = 0xFFFF;
+  if (typeof message === 'undefined') {
+    message = reg_init
+    reg_init = 0xFFFF
   }
   let crc_reg = reg_init
   let len = message.length
   let index = 0
-  while (len--){
+  while (len--) {
     crc_reg = ((crc_reg << 8) ^ crc16_ccitt_tabl[((crc_reg >> 8) ^ (message[index++])) & 0xff]) & 0xffff
   }
   return crc_reg
