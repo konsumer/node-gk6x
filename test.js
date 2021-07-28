@@ -71,8 +71,12 @@ test('matrix', async () => {
   }
 })
 
-// I skip this because it alters the keyboard
-test.skip('writeMacVid', async () => {
+test.skip('mess up keyboard by making it look like apple device', async () => {
   const r = await device.writeMacVid()
   console.log(r)
+})
+
+// this needs root because my udev rules don't even apply!
+test.skip('fix messed up keyboard', () => {
+  Gk6xDevice.writeNormalVid()
 })
