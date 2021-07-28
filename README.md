@@ -26,7 +26,7 @@ you should see a line that looks like this:
 Bus 001 Device 016: ID 1ea7:0907 SHARKOON Technologies GmbH Keyboard
 ```
 
-I'm not quite sure how to do this on other OS's (someone that uses them should let me know!)
+I'm not quite sure how to do this on other OS's (someone that uses them should let me know!) Basically a ton of programmable keyboards by epomaker (and clones) should work.
 
 ## usage
 
@@ -34,7 +34,7 @@ I'm not quite sure how to do this on other OS's (someone that uses them should l
 
 On Linux, you will need to run with `sudo` or [add udev rules](https://github.com/node-hid/node-hid#udev-device-permissions) to give you access to raw HID devices.
 
-I made one that looks like this, in :
+I made one that looks like this, in /etc/udev/rules.d/gk6x.rule:
 
 ```
 SUBSYSTEM=="input", GROUP="input", MODE="0666"
@@ -42,16 +42,10 @@ SUBSYSTEM=="usb", ATTRS{idVendor}=="1ea7", ATTRS{idProduct}=="0907", MODE:="666"
 KERNEL=="hidraw*", ATTRS{idVendor}=="1ea7", ATTRS{idProduct}=="0907", MODE="0666", GROUP="plugdev"
 ```
 
-I added myself to `plugdev` (and rebooted):
+I added myself to `plugdev` (then rebooted):
 
 ```sh
 sudo adduser $(whoami) plugdev
-```
-
-Then ran this:
-
-```sh
-sudo udevadm control --reload-rules
 ```
 
 ### CLI

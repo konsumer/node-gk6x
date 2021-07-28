@@ -2,10 +2,8 @@
   "name": "gk6x",
   "version": "0.0.0",
   "type": "module",
-  "description": "This adds support for GK6X keyboards in nodejs.",
-  "main": "index.js",
   "scripts": {
-    "test": "node --no-warnings --experimental-vm-modules node_modules/jest/bin/jest.js --silent --verbose"
+    "test": "node --no-warnings --experimental-vm-modules node_modules/jest/bin/jest.js --verbose"
   },
   "keywords": [],
   "author": "David Konsumer <konsumer@jetboystudio.com>",
