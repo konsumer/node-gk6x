@@ -1,13 +1,19 @@
 import { Gk6xDevice } from './index.js'
 
-// NOTE: You should have a keyboard attached & permissions to list hid for this to work
+// NOTE: You should have a keyboard attached & permissions to mess with HID for this to work
 
-test('should be able to find a real keyboard', () => {
-  const keyboards = Gk6xDevice.list()
-  expect(keyboards.length).toBeGreaterThan(0)
+// use 1 device for all tests
+let device
+beforeAll(() => {
+  device = new Gk6xDevice()
 })
 
-test.skip('should be able to setup a device', () => {
-  const device = new Gk6xDevice()
-  console.log(device)
+afterAll(() => {
+  device.close()
+})
+
+test('should be able to find a real keyboard', async () => {
+  const keyboards = Gk6xDevice.list()
+  expect(keyboards.length).toBeGreaterThan(0)
+  expect(device).toBeDefined()
 })

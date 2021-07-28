@@ -34,7 +34,7 @@ I'm not quite sure how to do this on other OS's (someone that uses them should l
 
 On Linux, you will need to run with `sudo` or [add udev rules](https://github.com/node-hid/node-hid#udev-device-permissions) to give you access to raw HID devices.
 
-I made one that looks like this, in /etc/udev/rules.d/gk6x.rule:
+I made one that looks like this, in /etc/udev/rules.d/gk6x.rules:
 
 ```
 SUBSYSTEM=="input", GROUP="input", MODE="0666"
