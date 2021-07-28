@@ -1,13 +1,9 @@
 import { devices, HID } from 'node-hid'
-import crc16_ccitt from './crc16_ccitt.js'
-
-// these are whould be shared by all GK96 keyboards
-const vendorId = 0x1ea7
-const productId = 0x0907
+import crc16ccitt from './crc16_ccitt.js'
 
 export class Gk6xDevice {
   static list () {
-    return devices().filter(d => d.vendorId === vendorId && d.productId === productId)
+    return devices().filter(d => (d.vendorId === 0x1ea7 && d.productId === 0x907))
   }
 
   constructor () {
@@ -33,7 +29,7 @@ export class Gk6xDevice {
     // key responses by command, so they can be returned
     this.responses = {}
     this.device.on('data', data => {
-      this.responses[ data[0] ] = data
+      this.responses[data[0]] = data
     })
   }
 
@@ -53,7 +49,7 @@ export class Gk6xDevice {
     if (options?.body) {
       options.body.copy(buffer, 8, 0, options.body.length)
     }
-    buffer.writeUInt16LE(crc16_ccitt(buffer), 6)
+    buffer.writeUInt16LE(crc16ccitt(buffer), 6)
     delete this.responses[cmd]
     this.device.write(buffer)
 
@@ -76,8 +72,15 @@ export class Gk6xDevice {
   }
 
   // set keyboard mode
-  changeMode(mode) {
+  changeMode (mode) {
     return this.cmd(0x0b, mode).then(buffer => buffer.readUInt8(1))
+  }
+
+  // BE CAREFUL!!!
+  // permanaently makes it look exactly like a mac keyboard to OS
+  // 05ac:024f Apple, Inc. Aluminium Keyboard (ANSI)
+  writeMacVid () {
+    return this.cmd(0x41, 0x01)
   }
 
   // check if the device is available
@@ -105,5 +108,13 @@ export class Gk6xDevice {
   // get model-id from keyboard
   modelId () {
     return this.cmd(0x01, 0x08).then(buffer => buffer.readUInt32LE(8))
+  }
+
+  // get key-matrix from keyboard
+  matrix () {
+    return this.cmd(0x01, 0x09).then(buffer => ({
+      col: buffer.readUInt8(8),
+      row: buffer.readUInt8(9)
+    }))
   }
 }
