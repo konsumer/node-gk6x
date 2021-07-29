@@ -1,6 +1,6 @@
 {
   "name": "@gk6x/core",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "type": "module",
   "source": "./index.js",
   "exports": "./dist/gk6x.modern.js",
