@@ -41,9 +41,8 @@ describe('Gk6xDevice', () => {
   })
 
   test('ping', async () => {
+    // first byte of response is always the op-code that was sent
     const [cmd] = await device.ping()
-
-    // first byte of response is always the op-code
     expect(cmd).toBe(0x0c)
   })
 
@@ -83,6 +82,7 @@ describe('Gk6xDevice', () => {
 
     if (konsumer) {
       expect(col).toBe(14)
+      expect(row).toBe(8)
     }
   })
 
