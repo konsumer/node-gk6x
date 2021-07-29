@@ -1,6 +1,6 @@
 import shelljs from 'shelljs'
-import { createGzip, createDeflate } from 'zlib'
-import { createReadStream, createWriteStream } from 'fs'
+import Zip from 'node-zip'
+import { createReadStream, createWriteStream, readFileSync, writeFileSync } from 'fs'
 
 const { mkdir, exec, cp, cd, rm, ls } = shelljs
 
@@ -8,26 +8,24 @@ rm('-rf',  'dist')
 mkdir('-p', 'dist')
 exec('lerna run build')
 cp('packages/cli/dist/gk6x-*', 'dist/')
+cd('dist')
 
-const fileContents1 = createReadStream('./dist/gk6x-linux')
-const writeStream1 = createWriteStream('./dist/gk6x-linux.gz')
-const zip1 = createGzip()
-fileContents1.pipe(zip1).pipe(writeStream1).on('finish', () => {
-  rm('./dist/gk6x-linux')
-})
+console.log('zipping dist/gk6x-linux.zip')
+const zip1 = Zip()
+zip1.file('gk6x', readFileSync('gk6x-linux'))
+writeFileSync('gk6x-linux.zip', zip1.generate({base64:false, compression:'DEFLATE'}), 'binary')
+rm('gk6x-linux')
 
-const fileContents2 = createReadStream('./dist/gk6x-macos')
-const writeStream2 = createWriteStream('./dist/gk6x-macos.gz')
-const zip2 = createGzip()
-fileContents2.pipe(zip2).pipe(writeStream2).on('finish', () => {
-  rm('./dist/gk6x-macos')
-})
+console.log('zipping dist/gk6x-macos.zip')
+const zip2 = Zip()
+zip2.file('gk6x', readFileSync('gk6x-macos'))
+writeFileSync('gk6x-macos.zip', zip2.generate({base64:false, compression:'DEFLATE'}), 'binary')
+rm('gk6x-macos')
 
+console.log('zipping dist/gk6x-win.zip')
+const zip3 = Zip()
+zip3.file('gk6x.exe', readFileSync('gk6x-win.exe'))
+writeFileSync('gk6x-win.zip', zip3.generate({base64:false, compression:'DEFLATE'}), 'binary')
+rm('gk6x-win.exe')
 
-const fileContents3 = createReadStream('./dist/gk6x-win.exe')
-const writeStream3 = createWriteStream('./dist/gk6x-win.gz')
-const zip3 = createGzip()
-fileContents3.pipe(zip3).pipe(writeStream3).on('finish', () => {
-  rm('./dist/gk6x-win.exe')
-})
 
