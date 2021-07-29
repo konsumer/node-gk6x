@@ -21,7 +21,6 @@
   },
   "homepage": "https://github.com/konsumer/node-gk6x#readme",
   "devDependencies": {
-    "easy-zip": "^0.0.4",
     "lerna": "^4.0.0",
     "node-zip": "^1.1.1",
     "shelljs": "^0.8.4"
