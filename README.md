@@ -62,7 +62,7 @@ Options:
   --version  Show version number                                       [boolean]
 ```
 
-Be careful with `apple` it messes with the keyboard ID to make it seem liek an official apple keyboard. You can set it back with `normal`, but you might need `sudo` on mac/linux.
+Be careful with `apple` it messes with the keyboard ID to make it seem like an official apple keyboard. You can set it back with `normal`, but you might need `sudo` on mac/linux.
 
 
 ### library

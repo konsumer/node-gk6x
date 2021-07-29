@@ -13,6 +13,8 @@
   },
   "homepage": "https://github.com/konsumer/node-gk6x#readme",
   "dependencies": {
+    "chalk": "^4.1.1",
+    "node-hid": "^2.1.1",
     "yargs": "^17.0.1"
   },
   "bin": {
