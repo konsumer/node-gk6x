@@ -45,6 +45,20 @@ function arrayEquals(a, b) {
     a.every((val, index) => val === b[index]);
 }
 
+function getKeysStandard() {
+  const keys = []
+  
+  if (d[0] && ModifierByKeys[ d[0] ]) {
+    keys.push(ModifierByKeys[ d[0] ])
+  }
+
+  if (d[2] && CodeByKeys[ d[2] ]){
+    keys.push(CodeByKeys[ d[2] ])
+  }
+
+  return keys
+}
+
 function getKeysExtended(buffer) {
   const keys = []
   const b = [...buffer.slice(1, 8)]
@@ -133,21 +147,7 @@ yargs(hideBin(process.argv))
         if (arrayEquals([...d], [0, 0, 0, 0, 0, 0, 0, 0])) {
           onData(d, 'Key Up', [])
         } else {
-          const keys = []
-          
-          if (d[0] && ModifierByKeys[ d[0] ]) {
-            keys.push(ModifierByKeys[ d[0] ])
-          }
-
-          if (d[2] && CodeByKeys[ d[2] ]){
-            keys.push(CodeByKeys[ d[2] ])
-          }
-
-          if (arrayEquals(['LCtrl', 'C'], keys)){
-            process.exit()
-          }
-
-          onData(d, 'Standard', keys)
+          onData(d, 'Standard', getKeysStandard(d))
         }
       })
     }
