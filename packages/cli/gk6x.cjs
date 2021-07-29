@@ -45,7 +45,7 @@ function arrayEquals(a, b) {
     a.every((val, index) => val === b[index]);
 }
 
-function getKeysStandard() {
+function getKeysStandard(d) {
   const keys = []
   
   if (d[0] && ModifierByKeys[ d[0] ]) {
@@ -147,7 +147,11 @@ yargs(hideBin(process.argv))
         if (arrayEquals([...d], [0, 0, 0, 0, 0, 0, 0, 0])) {
           onData(d, 'Key Up', [])
         } else {
-          onData(d, 'Standard', getKeysStandard(d))
+          const keys = getKeysStandard(d)
+          onData(d, 'Standard', keys)
+          if (arrayEquals(['LCtrl', 'C'], keys)){
+            process.exit()
+          }
         }
       })
     }
