@@ -8,7 +8,7 @@ const { devices, HID } = require('node-hid')
 const chalk = require('chalk')
 
 // stupid hack to make pkg work
-const { Gk6xDevice, getInfoFromLEBuffer } = require('./node_modules/@gk6x/core')
+const { Gk6xDevice, getInfoFromLEBuffer, KeyModifiers, KeyCodes } = require('./node_modules/@gk6x/core')
 
 function convertLEtoPixeltris(buffer) {
   const info = getInfoFromLEBuffer(buffer)
@@ -34,8 +34,71 @@ function convertPixeltrisToLE(buffer) {
   return out
 }
 
-function onData(data, name = 'Unknown') {
-  console.log(chalk.yellow(name).padEnd(20, ' '), chalk.white(data.slice(0, 8).toString('hex').replace(/([0-9a-f]{2})/g, '$1 ').toUpperCase()))
+function onData(data, name, keys) {
+  console.log(chalk.yellow(name).padEnd(20, ' '), chalk.white(data.slice(0, 8).toString('hex').replace(/([0-9a-f]{2})/g, '$1 ').toUpperCase()), keys)
+}
+
+function arrayEquals(a, b) {
+  return Array.isArray(a) &&
+    Array.isArray(b) &&
+    a.length === b.length &&
+    a.every((val, index) => val === b[index]);
+}
+
+function getInt64Bytes(x) {
+  let y= Math.floor(x/2**32);
+  return [y,(y<<8),(y<<16),(y<<24), x,(x<<8),(x<<16),(x<<24)].map(z=> z>>>24)
+}
+
+function intFromBytes(byteArr) {
+  return byteArr.reduce((a,c,i)=> a+c*2**(56-i*8),0)
+}
+
+function getKeysNormal(buffer) {
+  const keys = []
+
+  Object.keys(KeyModifiers).forEach(k => {
+    if (k !== 'None') {
+      if (buffer[0] & KeyModifiers[k]) {
+        keys.push(k)
+      }
+    }
+  })
+
+  const cmp = [...buffer].slice(1, -4)
+  Object.keys(KeyCodes).forEach(k  => {
+    if (k !== 'None' && k !== 'Disabled') {
+      const b =  getInt64Bytes(KeyCodes[k]).slice(5)
+      if (arrayEquals(b, cmp)) {
+        keys.push(k)
+      }
+    }
+  })
+
+  return keys
+}
+
+function getKeysExtended(buffer) {
+  const keys = []
+  const b = [...buffer.slice(1, 8)]
+
+  if (arrayEquals(b, [0x02, 0x00, 0x00, 0x00, 0x00, 0xA3, 0x11])){
+    keys.push('KeyboardWindowsModeOn')
+  }
+
+  if (arrayEquals(b, [0x01, 0x00, 0x00, 0x00, 0x00, 0xA7, 0x25])){
+    keys.push('KeyboardModeOff')
+  }
+
+  if (arrayEquals(b, [0x03, 0x00, 0x00, 0x00, 0x00, 0x5F, 0x02])){
+    keys.push('KeyboardMacModeOn')
+  }
+
+  if (arrayEquals(b, [0x04, 0x00, 0x00, 0x00, 0x00, 0xAB, 0x79])){
+    keys.push('KeyboardMode3On')
+  }
+
+  return keys
 }
 
 yargs(hideBin(process.argv))  
@@ -80,20 +143,37 @@ yargs(hideBin(process.argv))
   })
 
   .command('show', 'Show incoming events', y => {}, async a => {
+    // set to raw, so you can enter keys without printing them
+    process.stdin.setRawMode(true)
+
     const k = new Gk6xDevice()
     const info = await k.modelInfo()
     console.log(`Listening on ${info.Name}`)
-    k.onData = d => onData(d, 'Extended')
+    k.onData = d => onData(d, 'Extended', getKeysExtended(d))
     await k.setKeyReport(true)
+    
     process.on('exit', () => {
+      process.stdin.setRawMode(false)
       k.setKeyReport(false)
+      k.close()
     })
 
     // this captures regular key-events
     const k0 = devices().find(d => (d.vendorId === 0x1ea7 && d.productId === 0x907 && d.usagePage === 1))
     if (k0) {
       const k1 = new HID(k0.path)
-      k1.on('data', d => onData(d, 'Layer 1'))
+      k1.on('data', d => {
+        if (arrayEquals([...d], [0, 0, 0, 0, 0, 0, 0, 0])) {
+          onData(d, 'Key Up', [])
+        } else {
+          const keys = getKeysNormal(d)
+          if (arrayEquals(keys, [ 'LCtrl', 'C' ])) {
+            process.exit()
+          } else {
+            onData(d, 'Layer 1', keys)
+          }
+        }
+      })
     }
   })
 
