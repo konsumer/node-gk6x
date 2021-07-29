@@ -1,12 +1,9 @@
 {
-  "name": "node-gk6x",
+  "name": "@gk6x/gui",
   "private": true,
+  "type": "module",
   "version": "0.0.0",
-  "description": "This adds support for GK6X keyboards in nodejs.",
-  "scripts": {
-    "test": "lerna run --stream test",
-    "postinstall": "lerna bootstrap"
-  },
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/konsumer/node-gk6x.git"
@@ -17,8 +14,5 @@
   "bugs": {
     "url": "https://github.com/konsumer/node-gk6x/issues"
   },
-  "homepage": "https://github.com/konsumer/node-gk6x#readme",
-  "devDependencies": {
-    "lerna": "^4.0.0"
-  }
+  "homepage": "https://github.com/konsumer/node-gk6x#readme"
 }

@@ -289,7 +289,7 @@ function headerObjectToBuffer (i) {
   return buffer
 }
 
-// this will turn an LE file/device buffer into an object
+// this will turn an LE file buffer into an object with header (info) and body (buffer to send to device)
 export function getInfoFromLEBuffer (buffer) {
   const encodedBody = buffer.slice(32)
   const header = headerBufferToObject(buffer.slice(0, 32))
@@ -317,6 +317,7 @@ export function getInfoFromLEBuffer (buffer) {
   return { header, body }
 }
 
+// this is basically to save an LE file from an info-object
 export function getLEBufferFromInfo ({ header: { typeId, typeName, time }, body }) {
   const dcrc = crc16ccitt(body)
   let nLen = body.length

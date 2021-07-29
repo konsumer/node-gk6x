@@ -1,0 +1,33 @@
+{
+  "name": "@gk6x/cli",
+  "version": "0.0.0",
+  "license": "MIT",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/konsumer/node-gk6x.git"
+  },
+  "keywords": [],
+  "author": "David Konsumer <konsumer@jetboystudio.com>",
+  "bugs": {
+    "url": "https://github.com/konsumer/node-gk6x/issues"
+  },
+  "homepage": "https://github.com/konsumer/node-gk6x#readme",
+  "dependencies": {
+    "@gk6x/core": "^0.0.0",
+    "yargs": "^17.0.1"
+  },
+  "bin": "./cli.js",
+  "scripts": {
+    "test": "node --no-warnings --experimental-vm-modules node_modules/jest/bin/jest.js --verbose",
+    "build": "microbundle && pkg --out-path=./dist/ ./dist/gk6x.cjs",
+    "prepublishOnly": "npm run build"
+  },
+  "devDependencies": {
+    "jest": "^27.0.6",
+    "microbundle": "^0.13.3",
+    "pkg": "^5.3.1"
+  },
+  "source": "./cli.js",
+  "main": "./dist/gk6x.cjs"
+}

@@ -1,0 +1,26 @@
+{
+  "name": "@gk6x/core",
+  "version": "0.0.0",
+  "type": "module",
+  "source": "./index.js",
+  "exports": "./dist/gk6x.modern.js",
+  "main": "./dist/gk6x.cjs",
+  "module": "./dist/gk6x.module.js",
+  "unpkg": "./dist/gk6x.umd.js",
+  "scripts": {
+    "test": "node --no-warnings --experimental-vm-modules node_modules/jest/bin/jest.js --verbose",
+    "build": "microbundle",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [],
+  "author": "David Konsumer <konsumer@jetboystudio.com>",
+  "license": "MIT",
+  "dependencies": {
+    "node-hid": "^2.1.1"
+  },
+  "devDependencies": {
+    "jest": "^27.0.6",
+    "microbundle": "^0.13.3",
+    "standard": "^16.0.3"
+  }
+}

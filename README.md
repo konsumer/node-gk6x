@@ -4,12 +4,6 @@ This adds support for GK6X keyboards in nodejs.
 
 --- 
 
-# WIP
-
-This is a work in progress. It's not ready for use.
-
----
-
 This will allow you program a ton of custom configs, in Mac, Windows, and Linux.
 
 ## supported devices
@@ -50,26 +44,25 @@ sudo adduser $(whoami) plugdev
 
 ### CLI
 
-> explanation goes here
+You can install it globally with `npm i -g @gk6x/cli`, and it will install `gk6x` in your path. You can also use it without installing `npx @gk6x/cli`.
 
 ### library
 
 You can also use this as a library in your own node-based project like this:
 
 ```sh
-npm i gk6x
+npm i @gk6x/core
 ```
 
-> explanation goes here
+It's probably only useful for people who want to write their own GUI or CLI utility.
+
 
 ## todo
 
-- make it actually work (it's a stub, now)
 - test on different OS's ([keyboard HID is known to be weird on mac/win](https://github.com/node-hid/node-hid#devices-node-hid-cannot-read))
 - make cli app for getting/setting params from official files
 - make TUI for setting up keyboard in terminal
-- support for updating firmware
-- use lerna to seperate lib/cli/gui
+- support for updating firmware (this seems to be missing form official software, too)
 - make builds of cli (via pkg) and gui (via [neutralino](https://neutralino.js.org/) or electron)
 
 ## thanks
