@@ -59,7 +59,6 @@ export class Gk6xDevice {
   // promise resolves on answer or errors on timeout
   cmd (cmd, sub_cmd = 0, header = 0, body, timeout = 1000) {
     const buffer = Buffer.alloc(64)
-    buffer.fill(0)
     buffer.writeUInt8(cmd, 0)
     buffer.writeUInt8(sub_cmd, 1)
     buffer.writeUInt32LE(header, 2)
@@ -105,7 +104,7 @@ export class Gk6xDevice {
 
   // check if the device is available
   ping () {
-    return this.cmd(0x0c)
+    return this.cmd(0x0c, 0, 0, 0, 5000)
   }
 
   // get firmware version from keyboard
@@ -148,11 +147,7 @@ export class Gk6xDevice {
       .then(buffer => ({ ack: buffer.readUInt8(1), crc: buffer.readUInt16LE(6) }))
   }
 
-  writeFnData (mode, addr, data) {
-    const header = (data.length << 16) + addr
-    return this.cmd(0x31, mode, header, data)
-      .then(buffer => ({ ack: buffer.readUInt8(1), crc: buffer.readUInt16LE(6) }))
-  }
+  // TODO: what is 0x23?
 
   writeModeLE (mode, addr, data) {
     const header = (data.length << 16) + addr
@@ -178,6 +173,16 @@ export class Gk6xDevice {
       .then(buffer => ({ ack: buffer.readUInt8(1), crc: buffer.readUInt16LE(6) }))
   }
 
+  // TODO: what is 0x28?
+  // TODO: what is 0x29?
+  // TODO: what is 0x30?
+
+  writeFnData (mode, addr, data) {
+    const header = (data.length << 16) + addr
+    return this.cmd(0x31, mode, header, data)
+      .then(buffer => ({ ack: buffer.readUInt8(1), crc: buffer.readUInt16LE(6) }))
+  }
+
   // tell keyboard to report keys or not
   setKeyReport (enabled) {
     return this.cmd(0x15, 0x03, 0, Buffer.from([enabled ? 0x01 : 0x00]))
@@ -190,6 +195,12 @@ export class Gk6xDevice {
 
   mouseEvent (mouse) {
     return this.cmd(0x15, 0x01, 0, Buffer.from([mouse]))
+  }
+
+  setKeyTable (byTableTyte, wAddr, BbyData) {
+    const header = wAddr + ((BbyData.length << 24) & 0xff000000)
+    return this.cmd(0x16, byTableTyte, header, BbyData)
+      .then(buffer => buffer.readUInt8(1) === 1)
   }
 
   setLEConfig (byLEModel, byLESubModel, byLELight, byLESpeed, byLEDir, byR, byG, byB, bEnable) {
@@ -217,10 +228,119 @@ export class Gk6xDevice {
     return this.cmd(0x1a, 0x02)
       .then(buffer => buffer.readUInt8(1) === 1)
   }
+}
 
-  setKeyTable (byTableTyte, wAddr, BbyData) {
-    const header = wAddr + ((BbyData.length << 24) & 0xff000000)
-    return this.cmd(0x16, byTableTyte, header, BbyData)
-      .then(buffer => buffer.readUInt8(1) === 1)
+const LETypes = ['_', 'PROFILE', 'LIGHT', 'STATASTIC', 'APPCONF', 'MACRO']
+
+// did it come from the correct place? Bad way to check, but ok
+const magicNumber = 0x434D4631
+
+function getInitCRC (type, name) {
+  const nameBuffer = Buffer.alloc(8)
+  nameBuffer.write(name, 0, 'latin1')
+  return crc16ccitt(crc16ccitt(Buffer.from(LETypes[type])), nameBuffer)
+}
+
+function decodeBodyBuffer ({ typeId, typeName }, pData) {
+  let gnCRC = getInitCRC(typeId, typeName)
+  let gnDataCRC = 0xFFFF
+  let nLen = pData.length
+  let index = 0
+  while (nLen > 0) {
+    pData[index] = pData[index] ^ (gnCRC & 0xFF)
+    gnCRC = crc16ccitt(gnCRC, pData.slice(index, index + 1))
+    gnDataCRC = crc16ccitt(gnDataCRC, pData.slice(index, index + 1))
+    index++
+    nLen--
   }
+  return pData
+}
+
+function headerBufferToObject (h) {
+  return {
+    magic: h.readUInt32LE(0),
+    hcrc: h.readUInt32LE(4),
+    time: h.readUInt32LE(8),
+    size: h.readUInt32LE(12),
+    dcrc: h.readUInt32LE(16),
+    typeId: h.readUInt8(20),
+    typeName: h.slice(24).toString('latin1').split('\x00')[0]
+  }
+}
+
+function headerObjectToBuffer (i) {
+  if (!i.typeId && !i.typeName) {
+    i.typeName = 'LIGHT'
+  }
+  if (i.typeName && !i.typeId) {
+    i.typeId = LETypes.indexOf(i.typeName)
+  }
+  if (!i.typeName && i.typeId) {
+    i.typeName = LETypes[i.typeId]
+  }
+  const buffer = Buffer.alloc(32)
+  buffer.writeUInt32LE(i.magic || magicNumber, 0)
+  buffer.writeUInt32LE(i.hcrc || 0, 4)
+  buffer.writeUInt32LE(i.time || Math.round(Date.now() / 1000), 8)
+  buffer.writeUInt32LE(i.size || 0, 12)
+  buffer.writeUInt32LE(i.dcrc || 0, 16)
+  buffer.writeUInt8(i.typeId, 20)
+  buffer.write(i.typeName, 24, 8, 'latin1')
+  return buffer
+}
+
+// this will turn an LE file/device buffer into an object
+export function getInfoFromLEBuffer (buffer) {
+  const encodedBody = buffer.slice(32)
+  const header = headerBufferToObject(buffer.slice(0, 32))
+
+  // check things
+  if (header.magic !== magicNumber) {
+    throw new Error('Invalid magic-number')
+  }
+
+  if (header.size !== encodedBody.length) {
+    throw new Error('Data size mismatch')
+  }
+
+  const hcrc = crc16ccitt(headerObjectToBuffer({ ...header, hcrc: 0 }))
+  if (hcrc !== header.hcrc) {
+    throw new Error('Header CRC mismatch')
+  }
+
+  const body = decodeBodyBuffer(header, encodedBody)
+
+  if (header.dcrc !== crc16ccitt(body)) {
+    throw new Error('Data CRC mismatch')
+  }
+
+  return { header, body }
+}
+
+export function getLEBufferFromInfo ({ header: { typeId, typeName, time }, body }) {
+  const dcrc = crc16ccitt(body)
+  let nLen = body.length
+  const info = {
+    magic: magicNumber,
+    hcrc: 0,
+    time: time || Math.round(Date.now() / 1000),
+    size: nLen,
+    dcrc,
+    typeId,
+    typeName
+  }
+  info.hcrc = crc16ccitt(headerObjectToBuffer(info))
+  let byData
+  let index = 0
+  let gnCRC = getInitCRC(info.typeId, info.typeName)
+  let gnDataCRC = 0xffff
+  while (nLen > 0) {
+    byData = body[index] ^ (gnCRC & 0xFF)
+    gnCRC = crc16ccitt(gnCRC, body.slice(index, index + 1))
+    gnDataCRC = crc16ccitt(gnDataCRC, body.slice(index, index + 1))
+    body[index] = byData
+    index++
+    nLen--
+  }
+  return Buffer.concat([headerObjectToBuffer(info), body])
 }
