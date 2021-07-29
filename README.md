@@ -46,6 +46,25 @@ sudo adduser $(whoami) plugdev
 
 You can install it globally with `npm i -g @gk6x/cli`, and it will install `gk6x` in your path. You can also use it without installing `npx @gk6x/cli`.
 
+```
+gk6x <command>
+
+Commands:
+  gk6x config <file>            Use le or pixeltris config format (easier to u
+                                  se) to setup your keyboard
+  gk6x convert <fileA> <fileB>  Convert to/from pixeltris and official le
+  gk6x apple                    Force your keyboard to pretend it's an officia
+                                  l apple keyboard
+  gk6x normal                   Remove the weird apple setup
+
+Options:
+  --help     Show help                                                 [boolean]
+  --version  Show version number                                       [boolean]
+```
+
+Be careful with `apple` it messes with the keyboard ID to make it seem liek an official apple keyboard. You can set it back with `normal`, but you might need `sudo` on mac/linux.
+
+
 ### library
 
 You can also use this as a library in your own node-based project like this:
@@ -60,10 +79,10 @@ It's probably only useful for people who want to write their own GUI or CLI util
 ## todo
 
 - test on different OS's ([keyboard HID is known to be weird on mac/win](https://github.com/node-hid/node-hid#devices-node-hid-cannot-read))
-- make cli app for getting/setting params from official files
 - make TUI for setting up keyboard in terminal
 - support for updating firmware (this seems to be missing form official software, too)
-- make builds of cli (via pkg) and gui (via [neutralino](https://neutralino.js.org/) or electron)
+- builds of cli (via pkg)
+- builds of gui (via [neutralino](https://neutralino.js.org/) or electron)
 
 ## thanks
 

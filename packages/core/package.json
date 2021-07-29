@@ -22,5 +22,8 @@
     "jest": "^27.0.6",
     "microbundle": "^0.13.3",
     "standard": "^16.0.3"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
