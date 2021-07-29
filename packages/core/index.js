@@ -1,11 +1,10 @@
 import { devices, HID } from 'node-hid'
 import crc16ccitt from './crc16_ccitt.js'
-import { LETypes, magicNumber, getInfoFromLEBuffer, getLEBufferFromInfo } from './lefile.js'
-import models from './modellist.json'
-import { Modifiers as KeyModifiers, Codes as KeyCodes } from './keys.js'
 
-export { LETypes, magicNumber, getInfoFromLEBuffer, getLEBufferFromInfo }
-export { KeyModifiers, KeyCodes }
+import models from './modellist.json'
+
+export { LETypes, magicNumber, getInfoFromLEBuffer, getLEBufferFromInfo } from './lefile.js'
+export { KeyCodes, CodeByKeys, KeyNames, KeyModifiers, ModifierByKeys } from './keys.js'
 
 export class Gk6xDevice {
   static list () {

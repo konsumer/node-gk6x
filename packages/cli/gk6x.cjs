@@ -8,7 +8,7 @@ const { devices, HID } = require('node-hid')
 const chalk = require('chalk')
 
 // stupid hack to make pkg work
-const { Gk6xDevice, getInfoFromLEBuffer, KeyModifiers, KeyCodes } = require('./node_modules/@gk6x/core')
+const { Gk6xDevice, getInfoFromLEBuffer, CodeByKeys, ModifierByKeys } = require('./node_modules/@gk6x/core')
 
 function convertLEtoPixeltris(buffer) {
   const info = getInfoFromLEBuffer(buffer)
@@ -45,45 +45,12 @@ function arrayEquals(a, b) {
     a.every((val, index) => val === b[index]);
 }
 
-function getInt64Bytes(x) {
-  let y= Math.floor(x/2**32);
-  return [y,(y<<8),(y<<16),(y<<24), x,(x<<8),(x<<16),(x<<24)].map(z=> z>>>24)
-}
-
-function intFromBytes(byteArr) {
-  return byteArr.reduce((a,c,i)=> a+c*2**(56-i*8),0)
-}
-
-function getKeysNormal(buffer) {
-  const keys = []
-
-  Object.keys(KeyModifiers).forEach(k => {
-    if (k !== 'None') {
-      if (buffer[0] & KeyModifiers[k]) {
-        keys.push(k)
-      }
-    }
-  })
-
-  const cmp = [...buffer].slice(1, -4)
-  Object.keys(KeyCodes).forEach(k  => {
-    if (k !== 'None' && k !== 'Disabled') {
-      const b =  getInt64Bytes(KeyCodes[k]).slice(5)
-      if (arrayEquals(b, cmp)) {
-        keys.push(k)
-      }
-    }
-  })
-
-  return keys
-}
-
 function getKeysExtended(buffer) {
   const keys = []
   const b = [...buffer.slice(1, 8)]
 
   if (arrayEquals(b, [0x02, 0x00, 0x00, 0x00, 0x00, 0xA3, 0x11])){
-    keys.push('KeyboardWindowsModeOn')
+    keys.push('KeyboardModeWindows')
   }
 
   if (arrayEquals(b, [0x01, 0x00, 0x00, 0x00, 0x00, 0xA7, 0x25])){
@@ -91,11 +58,11 @@ function getKeysExtended(buffer) {
   }
 
   if (arrayEquals(b, [0x03, 0x00, 0x00, 0x00, 0x00, 0x5F, 0x02])){
-    keys.push('KeyboardMacModeOn')
+    keys.push('KeyboardModeMac')
   }
 
   if (arrayEquals(b, [0x04, 0x00, 0x00, 0x00, 0x00, 0xAB, 0x79])){
-    keys.push('KeyboardMode3On')
+    keys.push('KeyboardMode3')
   }
 
   return keys
@@ -166,12 +133,21 @@ yargs(hideBin(process.argv))
         if (arrayEquals([...d], [0, 0, 0, 0, 0, 0, 0, 0])) {
           onData(d, 'Key Up', [])
         } else {
-          const keys = getKeysNormal(d)
-          if (arrayEquals(keys, [ 'LCtrl', 'C' ])) {
-            process.exit()
-          } else {
-            onData(d, 'Layer 1', keys)
+          const keys = []
+          
+          if (d[0] && ModifierByKeys[ d[0] ]) {
+            keys.push(ModifierByKeys[ d[0] ])
           }
+
+          if (d[2] && CodeByKeys[ d[2] ]){
+            keys.push(CodeByKeys[ d[2] ])
+          }
+
+          if (arrayEquals(['LCtrl', 'C'], keys)){
+            process.exit()
+          }
+
+          onData(d, 'Standard', keys)
         }
       })
     }
