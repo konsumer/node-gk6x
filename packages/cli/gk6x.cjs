@@ -7,6 +7,9 @@ const fs = require('fs').promises
 // stupid hack to make pkg work
 const { Gk6xDevice, getInfoFromLEBuffer } = require('./node_modules/@gk6x/core')
 
+function convertLEtoPixeltris(source) {}
+
+function convertPixeltrisToLE(source) {}
 
 yargs(hideBin(process.argv))  
   .command('config <file>', 'Use le or pixeltris config format (easier to use) to setup your keyboard', () => {}, async (argv) => {

@@ -16,10 +16,10 @@
     "yargs": "^17.0.1"
   },
   "bin": {
-    "gk6x": "./gk6x.js"
+    "gk6x": "./gk6x.cjs"
   },
   "scripts": {
-    "build": "pkg ./gk6x.js  --out-path dist"
+    "build": "pkg ./gk6x.cjs  --out-path dist"
   },
   "devDependencies": {
     "@gk6x/core": "^0.0.2",
