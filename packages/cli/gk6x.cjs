@@ -89,8 +89,7 @@ yargs(hideBin(process.argv))
       k.setKeyReport(false)
     })
 
-    console.log(devices())
-
+    // this captures regular key-events
     const k0 = devices().find(d => (d.vendorId === 0x1ea7 && d.productId === 0x907 && d.usagePage === 1))
     if (k0) {
       const k1 = new HID(k0.path)
