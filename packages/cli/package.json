@@ -1,6 +1,6 @@
 {
   "name": "@gk6x/cli",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "license": "MIT",
   "type": "module",
   "repository": {
@@ -14,7 +14,7 @@
   },
   "homepage": "https://github.com/konsumer/node-gk6x#readme",
   "dependencies": {
-    "@gk6x/core": "^0.0.0",
+    "@gk6x/core": "^0.0.1",
     "yargs": "^17.0.1"
   },
   "bin": {

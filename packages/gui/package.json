@@ -2,7 +2,7 @@
   "name": "@gk6x/gui",
   "private": true,
   "type": "module",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -10,7 +10,6 @@
   },
   "keywords": [],
   "author": "David Konsumer <konsumer@jetboystudio.com>",
-  "license": "MIT",
   "bugs": {
     "url": "https://github.com/konsumer/node-gk6x/issues"
   },
