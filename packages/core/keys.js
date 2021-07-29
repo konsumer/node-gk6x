@@ -10,6 +10,7 @@ export const KeyModifiers = {
   RWin: 0x80
 }
 
+// same list, but for looking up in the other direction
 export const ModifierByKeys = Object.keys(KeyModifiers).reduce((a, c, i) => {
   return { ...a, [KeyModifiers[c]]: c }
 }, {})
