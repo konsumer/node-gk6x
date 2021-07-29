@@ -7,13 +7,11 @@ import { promises as fs } from 'fs'
 
 yargs(hideBin(process.argv))  
   .command('config <file>', 'Use le or pixeltris config format (easier to use) to setup your keyboard', () => {}, async (argv) => {
-    const k = new Gk6xDevice()
-
-    k.close()
+    console.error('Not implemented yet. Check back, soon.')
   })
   
   .command('convert <fileA> <fileB>', 'Convert to/from pixeltris and official le', () => {}, async (argv) => {
-    console.info(argv)
+    console.error('Not implemented yet. Check back, soon.')
   })
   
   .command('apple', "Force your keyboard to pretend it's an official apple keyboard", () => {}, (argv) => {
