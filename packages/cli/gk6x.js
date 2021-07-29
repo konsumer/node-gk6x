@@ -1,9 +1,12 @@
 #!/usr/bin/env node
 
-import yargs from 'yargs'
-import { hideBin } from 'yargs/helpers'
-import { Gk6xDevice, getInfoFromLEBuffer } from '@gk6x/core'
-import { promises as fs } from 'fs'
+const yargs = require('yargs/yargs')
+const { hideBin } = require('yargs/helpers')
+const fs = require('fs').promises
+
+// stupid hack to make pkg work
+const { Gk6xDevice, getInfoFromLEBuffer } = require('./node_modules/@gk6x/core')
+
 
 yargs(hideBin(process.argv))  
   .command('config <file>', 'Use le or pixeltris config format (easier to use) to setup your keyboard', () => {}, async (argv) => {
